@@ -27,15 +27,36 @@ Single-page dark UI, який показує:
 
 ## Оновлення
 
-Edit `data.json` → commit → push. GitHub Pages переденерує за 1-2 хв.
+### Автоматизована частина (issue counts + `updated`)
 
-Поля, які треба оновлювати щотижня:
+`update.ps1` тягне свіжі issue counts через `gh api` для labels у [VS-Prod-Code/p1_crm](https://github.com/VS-Prod-Code/p1_crm), переписує `evidence` у кожній фазі і ставить сьогоднішнє `updated`. Запуск під час Friday PM cadence:
 
-- `updated` — поточна дата (`YYYY-MM-DD`).
-- `phases[].status` — `planned | in-progress | done | tbd`.
-- `phases[].evidence.closed` / `.open` — числа issues по labels у [VS-Prod-Code/p1_crm](https://github.com/VS-Prod-Code/p1_crm).
+```powershell
+cd ~/Documents/!VAKULA_WORK/p1-progress
+./update.ps1            # update + commit + push
+./update.ps1 -DryRun    # тільки оновити файл, без git ops
+```
 
-`start` / `deadline` / `phases[].start` / `phases[].end` міняти лише якщо план реально змінився.
+Передумова: `gh` авторизований під твоїм акаунтом з доступом до приватного `VS-Prod-Code/p1_crm`.
+
+### Ручна частина (status, дати)
+
+Після `update.ps1` за потреби edit `data.json`:
+
+- `phases[].status` — `planned | in-progress | done | tbd` (це **людська оцінка**, не похідна від issues).
+- `start` / `deadline` / `phases[].start` / `phases[].end` — лише якщо план реально змінився.
+
+Тоді просто `git commit -am "..." && git push`.
+
+### Auto refresh via GitHub Actions
+
+`.github/workflows/refresh-data.yml` має ручний тригер `workflow_dispatch` (кнопка **Run workflow** в Actions). Для cron щопʼятниці потрібен PAT secret:
+
+1. [Створи fine-grained PAT](https://github.com/settings/personal-access-tokens/new) з доступом до `VS-Prod-Code/p1_crm` (Repository permissions → **Issues: Read**, **Metadata: Read**).
+2. Додай secret у [Settings → Secrets and variables → Actions](https://github.com/VS-Prod-Code/p1-progress/settings/secrets/actions) під назвою `P1_CRM_READ_PAT`.
+3. Розкоментуй `schedule:` блок у [`.github/workflows/refresh-data.yml`](.github/workflows/refresh-data.yml).
+
+Cron: `0 19 * * 5` = пʼятниця 19:00 UTC = **22:00 EEST** (літо) / 21:00 EET (зима).
 
 ## Reference
 

@@ -1,0 +1,50 @@
+name: Refresh data
+
+# Triggers
+#   - workflow_dispatch: manual button in Actions tab (works without PAT for repos
+#     where this repo's GITHUB_TOKEN already has read access — not our case, since
+#     P1 CRM is in a different private repo)
+#   - schedule: weekly cron — requires a PAT secret named P1_CRM_READ_PAT with
+#     `repo` scope on VS-Prod-Code/p1_crm. Uncomment the schedule block once the
+#     secret is configured (see README → "Auto refresh via GitHub Actions").
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 19 * * 5'  # Friday 19:00 UTC = 22:00 EEST (summer) / 21:00 EET (winter)
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refresh data.json
+        env:
+          # PAT with repo:read on VS-Prod-Code/p1_crm. Required because that repo
+          # is private and the default GITHUB_TOKEN can't reach it. Add via:
+          #   Settings → Secrets and variables → Actions → New secret
+          # If missing, this step fails fast with a clear error.
+          GH_TOKEN: ${{ secrets.P1_CRM_READ_PAT }}
+        shell: pwsh
+        run: |
+          if (-not $env:GH_TOKEN) {
+            Write-Error "Missing secret P1_CRM_READ_PAT (PAT with repo:read on VS-Prod-Code/p1_crm). See README."
+            exit 1
+          }
+          ./update.ps1 -DryRun
+
+      - name: Commit if changed
+        run: |
+          if [[ -n "$(git status --porcelain data.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data.json
+            git commit -m "chore: weekly data refresh — $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "No changes."
+          fi

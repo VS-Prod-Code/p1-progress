@@ -13,7 +13,10 @@
       "end": "2026-06-04",
       "status": "in-progress",
       "label": "phase-1b",
-      "evidence": { "closed": 51, "open": 10 }
+      "evidence": {
+        "closed": 51,
+        "open": 10
+      }
     },
     {
       "id": "phase-2a",
@@ -23,7 +26,11 @@
       "end": "2026-06-18",
       "status": "planned",
       "label": "phase-2",
-      "evidence": { "closed": 6, "open": 6, "note": "shared phase-2 label" }
+      "evidence": {
+        "note": "shared phase-2 label",
+        "closed": 6,
+        "open": 6
+      }
     },
     {
       "id": "phase-2b",
