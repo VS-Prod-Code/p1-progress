@@ -1,0 +1,53 @@
+{
+  "project": "P1 CRM",
+  "start": "2026-04-30",
+  "deadline": "2026-07-15",
+  "updated": "2026-05-21",
+  "repo": "VS-Prod-Code/p1_crm",
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Phase 1",
+      "description": "Базова CRM — ролі, проекти, чат, воркфлоу, файлосклад",
+      "start": "2026-04-30",
+      "end": "2026-06-04",
+      "status": "in-progress",
+      "label": "phase-1b",
+      "evidence": { "closed": 51, "open": 10 }
+    },
+    {
+      "id": "phase-2a",
+      "name": "Phase 2a",
+      "description": "Бот-P1 (вузький): генерація ТЗ, інвойсів, нагадування",
+      "start": "2026-06-04",
+      "end": "2026-06-18",
+      "status": "planned",
+      "label": "phase-2",
+      "evidence": { "closed": 6, "open": 6, "note": "shared phase-2 label" }
+    },
+    {
+      "id": "phase-2b",
+      "name": "Phase 2b",
+      "description": "Бот-P1 (розширений): оцінка робіт, SLA, звіти",
+      "start": "2026-06-18",
+      "end": "2026-07-02",
+      "status": "planned"
+    },
+    {
+      "id": "phase-2cd",
+      "name": "Phase 2c-d",
+      "description": "Бот-Клієнт + Бот-Підрядник (після валідації P1)",
+      "start": "2026-07-02",
+      "end": "2026-07-15",
+      "status": "planned"
+    },
+    {
+      "id": "phase-3",
+      "name": "Phase 3",
+      "description": "Лідогенерація, інтеграції",
+      "start": null,
+      "end": null,
+      "status": "tbd"
+    }
+  ]
+}
