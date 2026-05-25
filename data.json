@@ -2,7 +2,7 @@
   "project": "P1 CRM",
   "start": "2026-04-30",
   "deadline": "2026-07-15",
-  "updated": "2026-05-23",
+  "updated": "2026-05-25",
   "repo": "VS-Prod-Code/p1_crm",
   "phases": [
     {
@@ -14,8 +14,8 @@
       "status": "in-progress",
       "label": "phase-1b",
       "evidence": {
-        "closed": 52,
-        "open": 13
+        "closed": 59,
+        "open": 7
       }
     },
     {
@@ -28,7 +28,7 @@
       "label": "phase-2",
       "evidence": {
         "note": "shared phase-2 label",
-        "closed": 6,
+        "closed": 7,
         "open": 9
       }
     },
