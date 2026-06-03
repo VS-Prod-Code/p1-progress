@@ -2,8 +2,14 @@
   "project": "P1 CRM",
   "start": "2026-04-30",
   "deadline": "2026-07-15",
-  "updated": "2026-06-01",
+  "updated": "2026-06-03",
   "repo": "VS-Prod-Code/p1_crm",
+  "milestones": [
+    {
+      "date": "2026-06-15",
+      "label": "Checkpoint"
+    }
+  ],
   "phases": [
     {
       "id": "phase-1",
@@ -14,8 +20,8 @@
       "status": "in-progress",
       "label": "phase-1b",
       "evidence": {
-        "closed": 59,
-        "open": 14
+        "closed": 61,
+        "open": 15
       }
     },
     {
@@ -29,7 +35,7 @@
       "evidence": {
         "note": "shared phase-2 label",
         "closed": 23,
-        "open": 9
+        "open": 15
       }
     },
     {

@@ -511,6 +511,20 @@
     dm.setAttribute('data-label','Deadline');
     ganttEl.appendChild(dm);
   }
+
+  // Milestone markers from data (checkpoints inside the range)
+  (data.milestones || []).forEach(m => {
+    if (!m.date) return;
+    const off = (daysBetween(rangeStart, m.date) / rangeTotal) * 100;
+    if (off < 0 || off > 100) return;
+    const mk = document.createElement('div');
+    mk.className = 'gantt-marker dim';
+    mk.style.left = off + '%';
+    mk.title = `${m.label || 'Milestone'} · ${fmtShort(m.date)}`;
+    mk.setAttribute('data-label', m.label || 'Milestone');
+    ganttEl.appendChild(mk);
+  });
+
   $('axis-start').textContent = fmtShort(rangeStart);
   $('axis-end').textContent = fmtShort(rangeEnd);
 
