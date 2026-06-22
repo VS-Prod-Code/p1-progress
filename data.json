@@ -4,12 +4,7 @@
   "deadline": "2026-07-15",
   "updated": "2026-06-22",
   "repo": "VS-Prod-Code/p1_crm",
-  "milestones": [
-    {
-      "date": "2026-06-15",
-      "label": "Checkpoint"
-    }
-  ],
+  "milestones": [],
   "phases": [
     {
       "id": "phase-1",
