@@ -2,7 +2,7 @@
   "project": "P1 CRM",
   "start": "2026-04-30",
   "deadline": "2026-07-15",
-  "updated": "2026-06-13",
+  "updated": "2026-06-22",
   "repo": "VS-Prod-Code/p1_crm",
   "milestones": [
     {
@@ -17,10 +17,10 @@
       "description": "Базова CRM — ролі, проекти, чат, воркфлоу, файлосклад",
       "start": "2026-04-30",
       "end": "2026-06-04",
-      "status": "in-progress",
+      "status": "done",
       "label": "phase-1b",
       "evidence": {
-        "closed": 72,
+        "closed": 73,
         "open": 4
       }
     },
@@ -30,12 +30,12 @@
       "description": "Бот-P1 (вузький): генерація ТЗ, інвойсів, нагадування",
       "start": "2026-06-04",
       "end": "2026-06-18",
-      "status": "planned",
+      "status": "in-progress",
       "label": "phase-2",
       "evidence": {
         "note": "shared phase-2 label",
-        "closed": 28,
-        "open": 21
+        "closed": 29,
+        "open": 23
       }
     },
     {
