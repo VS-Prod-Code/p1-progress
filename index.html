@@ -315,6 +315,69 @@
     margin-left:6px;
   }
 
+  /* Schedule-health pill */
+  .health{
+    display:inline-block;
+    margin-top:16px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    padding:4px 10px;
+    border-radius:11px;
+    font-weight:500;
+    white-space:nowrap;
+    cursor:default;
+  }
+  .health.ok{background:rgba(62,207,142,.12);color:var(--work)}
+  .health.warn{background:rgba(245,158,11,.12);color:var(--warn)}
+  .health.behind{background:rgba(239,68,68,.12);color:var(--danger)}
+
+  /* Momentum sparkline */
+  .spark-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .spark-legend{
+    display:flex;
+    gap:18px;
+    font-size:15px;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .spark-legend b{color:var(--ink);font-weight:500}
+  .spark-legend .dot{
+    display:inline-block;
+    width:8px;height:8px;
+    border-radius:2px;
+    margin-right:7px;
+    vertical-align:middle;
+  }
+  .spark-legend .dot.closed{background:var(--work)}
+  .spark-legend .dot.open{background:var(--time)}
+  .spark-delta{
+    font-size:15px;
+    color:var(--work);
+    font-variant-numeric:tabular-nums;
+    font-weight:500;
+  }
+  .spark-svg{
+    width:100%;
+    height:56px;
+    display:block;
+    overflow:visible;
+  }
+  .spark-foot{
+    display:flex;
+    justify-content:space-between;
+    margin-top:8px;
+    font-size:14px;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .spark-empty{font-size:15px;color:var(--muted)}
+
   footer{
     margin-top:96px;
     padding-top:24px;
@@ -371,6 +434,7 @@
       <div class="days-label" id="days-label">days remaining</div>
     </div>
     <div class="deadline" id="deadline-line">—</div>
+    <span class="health" id="health" style="display:none"></span>
   </div>
 
   <section>
@@ -386,6 +450,23 @@
         <span id="time-end">—</span>
       </div>
     </div>
+  </section>
+
+  <section id="momentum">
+    <div class="section-title">Momentum</div>
+    <div class="spark-head" id="spark-head">
+      <div class="spark-legend">
+        <span><span class="dot closed"></span>Closed <b id="spark-closed-val">—</b></span>
+        <span><span class="dot open"></span>Open <b id="spark-open-val">—</b></span>
+      </div>
+      <span class="spark-delta" id="spark-delta">—</span>
+    </div>
+    <svg class="spark-svg" id="spark" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div class="spark-foot" id="spark-foot">
+      <span id="spark-start">—</span>
+      <span id="spark-end">—</span>
+    </div>
+    <div class="spark-empty" id="spark-empty" style="display:none">Накопичується — потрібно ≥2 зрізи історії.</div>
   </section>
 
   <section>
@@ -462,6 +543,64 @@
   $('time-fill').style.width = timePct + '%';
   $('time-start').textContent = fmtShort(data.start);
   $('time-end').textContent = fmtShort(data.deadline);
+
+  // Schedule-health pill — heuristic: issues-closed% vs time-elapsed%.
+  // Issues aren't the full scope (see notice), so this is a rough signal only.
+  const totClosed = data.phases.reduce((s,p) => s + (p.evidence?.closed || 0), 0);
+  const totOpen   = data.phases.reduce((s,p) => s + (p.evidence?.open   || 0), 0);
+  if (totClosed + totOpen > 0) {
+    const workPct = (totClosed / (totClosed + totOpen)) * 100;
+    const diff = workPct - timePct;
+    let cls, label;
+    if (diff >= 0)        { cls = 'ok';     label = 'On schedule'; }
+    else if (diff >= -10) { cls = 'warn';   label = 'Slightly behind'; }
+    else                  { cls = 'behind'; label = 'Behind'; }
+    const hEl = $('health');
+    hEl.className = 'health ' + cls;
+    hEl.textContent = label;
+    hEl.title = `${Math.round(workPct)}% issues closed vs ${Math.round(timePct)}% time elapsed `
+              + `· rough heuristic — issues aren't the full scope`;
+    hEl.style.display = 'inline-block';
+  }
+
+  // Momentum sparkline — closed (velocity) + open lines over history snapshots
+  const hist = (data.history || []).filter(h => h.date).slice().sort((a,b) => a.date < b.date ? -1 : 1);
+  if (hist.length >= 2) {
+    const W = 320, H = 56, pad = 5;
+    const maxV = Math.max(1, ...hist.map(h => Math.max(h.closed || 0, h.open || 0)));
+    const px = i => pad + (i / (hist.length - 1)) * (W - 2 * pad);
+    const py = v => H - pad - (v / maxV) * (H - 2 * pad);
+    const pts = key => hist.map((h, i) => `${px(i).toFixed(1)},${py(h[key] || 0).toFixed(1)}`).join(' ');
+    const SVG = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs) => {
+      const e = document.createElementNS(SVG, tag);
+      for (const k in attrs) e.setAttribute(k, attrs[k]);
+      return e;
+    };
+    const polyAttrs = stroke => ({
+      points: '', fill: 'none', stroke,
+      'stroke-width': 1.75, 'vector-effect': 'non-scaling-stroke',
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round'
+    });
+    const svg = $('spark');
+    svg.appendChild(mk('polyline', { ...polyAttrs('var(--time)'), points: pts('open') }));
+    svg.appendChild(mk('polyline', { ...polyAttrs('var(--work)'), points: pts('closed') }));
+    const last = hist.length - 1;
+    svg.appendChild(mk('circle', { cx: px(last), cy: py(hist[last].open || 0),   r: 2.5, fill: 'var(--time)' }));
+    svg.appendChild(mk('circle', { cx: px(last), cy: py(hist[last].closed || 0), r: 2.5, fill: 'var(--work)' }));
+
+    const dClosed = (hist[last].closed || 0) - (hist[0].closed || 0);
+    $('spark-closed-val').textContent = hist[last].closed || 0;
+    $('spark-open-val').textContent   = hist[last].open || 0;
+    $('spark-delta').textContent = `${dClosed >= 0 ? '+' : ''}${dClosed} closed since ${fmtShort(hist[0].date)}`;
+    $('spark-start').textContent = fmtShort(hist[0].date);
+    $('spark-end').textContent   = fmtShort(hist[last].date);
+  } else {
+    $('spark-head').style.display = 'none';
+    $('spark').style.display = 'none';
+    $('spark-foot').style.display = 'none';
+    $('spark-empty').style.display = 'block';
+  }
 
   // Gantt: phases with concrete dates only
   const datedPhases = data.phases.filter(p => p.start && p.end);

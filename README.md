@@ -9,7 +9,9 @@
 Single-page dark UI, який показує:
 
 - **Days to deadline** — головний показник, точний завжди (на основі календаря).
+- **Schedule-health pill** — `On schedule / Slightly behind / Behind`. Евристика: % закритих issue vs % часу, що минув. Грубий сигнал (issues ≠ весь обсяг), tooltip показує обидва числа.
 - **Time elapsed** — скільки часу минуло з початку проекту.
+- **Momentum** — sparkline closed/open issue по зрізах із `history[]` (velocity + burndown). Рендериться при ≥2 точках.
 - **Roadmap (Gantt)** — фази на часовій осі з маркером `TODAY`.
 - **Phases** — статус кожної фази (`Planned / In Progress / Done / TBD`) + опис + дати + issues evidence.
 
@@ -29,7 +31,7 @@ Single-page dark UI, який показує:
 
 ### Автоматизована частина (issue counts + `updated`)
 
-`update.ps1` тягне свіжі issue counts через `gh api` для labels у [VS-Prod-Code/p1_crm](https://github.com/VS-Prod-Code/p1_crm), переписує `evidence` у кожній фазі і ставить сьогоднішнє `updated`. Запуск під час Friday PM cadence:
+`update.ps1` тягне свіжі issue counts через `gh api` для labels у [VS-Prod-Code/p1_crm](https://github.com/VS-Prod-Code/p1_crm), переписує `evidence` у кожній фазі, ставить сьогоднішнє `updated` і **дописує агрегований зріз** `{date, closed, open}` у `history[]` (один запис на день — повторний запуск того ж дня перезаписує). Запуск під час Friday PM cadence:
 
 ```powershell
 cd ~/Documents/!VAKULA_WORK/p1-progress

@@ -5,6 +5,38 @@
   "updated": "2026-06-22",
   "repo": "VS-Prod-Code/p1_crm",
   "milestones": [],
+  "history": [
+    {
+      "date": "2026-05-25",
+      "closed": 66,
+      "open": 16
+    },
+    {
+      "date": "2026-05-29",
+      "closed": 82,
+      "open": 16
+    },
+    {
+      "date": "2026-06-01",
+      "closed": 82,
+      "open": 23
+    },
+    {
+      "date": "2026-06-03",
+      "closed": 84,
+      "open": 30
+    },
+    {
+      "date": "2026-06-13",
+      "closed": 100,
+      "open": 25
+    },
+    {
+      "date": "2026-06-22",
+      "closed": 102,
+      "open": 27
+    }
+  ],
   "phases": [
     {
       "id": "phase-1",

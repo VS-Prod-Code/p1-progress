@@ -47,6 +47,17 @@ foreach ($label in $labels) {
 
 $data.updated = $today
 
+# Append (or refresh) today's aggregate snapshot for the Momentum sparkline.
+$totClosed = ($data.phases | ForEach-Object { $_.evidence.closed } | Where-Object { $_ -ne $null } | Measure-Object -Sum).Sum
+$totOpen   = ($data.phases | ForEach-Object { $_.evidence.open }   | Where-Object { $_ -ne $null } | Measure-Object -Sum).Sum
+if (-not $data.PSObject.Properties['history']) {
+  $data | Add-Member -NotePropertyName history -NotePropertyValue @() -Force
+}
+$snapshots = @($data.history | Where-Object { $_.date -ne $today })
+$snapshots += [PSCustomObject]@{ date = $today; closed = [int]$totClosed; open = [int]$totOpen }
+$data.history = @($snapshots | Sort-Object date)
+Write-Host ("  history     {0,3} points · today {1} closed / {2} open" -f $data.history.Count, $totClosed, $totOpen)
+
 $json = $data | ConvertTo-Json -Depth 20
 [System.IO.File]::WriteAllText($dataFile, $json + "`n", [System.Text.UTF8Encoding]::new($false))
 
